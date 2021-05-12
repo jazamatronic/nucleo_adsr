@@ -200,8 +200,8 @@ void process_env(env_gen_t *env, uint16_t gate, uint16_t trigger)
 	if (env->adsr[ATTACK] > 0) {
 	  env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * (ADC_FS / env->adsr[ATTACK]);
 	} else {
-	  //attack is zero, phase_inc is 1
-	  env->phase_inc = 1;
+	  //attack is zero, phase_inc is twice what it would be if it were one
+	  env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * 2 * ADC_FS;
 	}
 	env->phase += env->phase_inc;
 	if (env->phase > ADSR_TABLE_LEN) {
@@ -223,8 +223,8 @@ void process_env(env_gen_t *env, uint16_t gate, uint16_t trigger)
 	if (env->adsr[DECAY] > 0) {
 	  env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * (ADC_FS / env->adsr[DECAY]);
 	} else {
-	  //release is zero, phase_inc is 1
-	  env->phase_inc = 1;
+	  //decay is zero, phase_inc is twice what it would be if it were one
+	  env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * 2 * ADC_FS;
 	}
 	env->phase -= env->phase_inc;
 	if (env->phase < 0) {
@@ -268,8 +268,8 @@ void process_env(env_gen_t *env, uint16_t gate, uint16_t trigger)
 	if (env->adsr[SUSTAIN] > 0) {
 	  env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * (ADC_FS / env->adsr[SUSTAIN]);
 	} else {
-	  //release is zero, phase_inc is 1
-	  env->phase_inc = 1;
+	  //sustain is zero, phase_inc is twice what it would be if it were one
+	  env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * 2 * ADC_FS;
 	}
 	env->phase += env->phase_inc;
 	if (env->phase > ADSR_TABLE_LEN) {
@@ -292,8 +292,8 @@ void process_env(env_gen_t *env, uint16_t gate, uint16_t trigger)
 	  if (env->adsr[RELEASE] > 0) {
 	    env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * (ADC_FS / env->adsr[RELEASE]);
 	  } else {
-	    //release is zero, phase_inc is 1
-	    env->phase_inc = 1;
+	    //release is zero, phase_inc is twice what it would be if it were one
+	    env->phase_inc = ((float32_t)ADSR_TABLE_LEN / (LONGEST_PHASE_S * ENV_SR)) * 2 * ADC_FS;
 	  }
 	  env->phase -= env->phase_inc;
 	  if (env->phase <= 0) {
