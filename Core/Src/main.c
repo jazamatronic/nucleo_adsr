@@ -58,6 +58,8 @@
 #define SEG_NO_CHANGE 0xFFFF
 #define CHANGE_THRESH (ADC_FS / 8)
 
+#define CATCH_THRESH  (ADC_FS / 64)
+
 //#define TOGGLE ; // Debug toggle of LD3 on the nucleo
 //#define SEEENVS ; // Debug make the leds flash like an envelope
 
@@ -116,10 +118,16 @@ static void MX_TIM1_Init(void);
 static void MX_TIM7_Init(void);
 /* USER CODE BEGIN PFP */
 
+uint16_t catch_param(uint16_t old, uint16_t cur, uint16_t thresh);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+uint16_t catch_param(uint16_t old, uint16_t cur, uint16_t thresh)
+{
+  return (abs(old - cur) < thresh) ? cur : old;
+}
 
 /* USER CODE END 0 */
 
@@ -218,12 +226,6 @@ int main(void)
   for (i = 0; i < NUM_ENVS; i++) {
     init_env(&envelopes[i]);
   }
-  envelopes[1].acurve = EXP;
-  envelopes[1].dcurve = EXP;
-  envelopes[1].rcurve = EXP;
-  envelopes[2].acurve = LOG;
-  envelopes[2].dcurve = LOG;
-  envelopes[2].rcurve = LOG;
 
   i = 0;
 
@@ -260,10 +262,10 @@ int main(void)
 	//update segment shapes choices based on these numbers
 	//Basically hold the button and move the pot of the parameter that you want to change shape
       } else {
-	envelopes[i].adsr[ATTACK]   = aADCxConvertedData[ATTACK];
-      	envelopes[i].adsr[DECAY]    = aADCxConvertedData[DECAY];
-      	envelopes[i].adsr[SUSTAIN]  = aADCxConvertedData[SUSTAIN];
-      	envelopes[i].adsr[RELEASE]  = aADCxConvertedData[RELEASE];
+	envelopes[i].adsr[ATTACK]   = catch_param(envelopes[i].adsr[ATTACK],  aADCxConvertedData[ATTACK],  CATCH_THRESH);
+      	envelopes[i].adsr[DECAY]    = catch_param(envelopes[i].adsr[DECAY],   aADCxConvertedData[DECAY],   CATCH_THRESH);
+      	envelopes[i].adsr[SUSTAIN]  = catch_param(envelopes[i].adsr[SUSTAIN], aADCxConvertedData[SUSTAIN], CATCH_THRESH);
+      	envelopes[i].adsr[RELEASE]  = catch_param(envelopes[i].adsr[RELEASE], aADCxConvertedData[RELEASE], CATCH_THRESH);
       }
 
       // Process the envelopes

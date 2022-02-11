@@ -357,8 +357,8 @@ void init_env(env_gen_t *env) {
   env->phase_inc = 0;
   env->current_state = IDLE;
   env->acurve = LIN;
-  env->dcurve = LIN;
-  env->rcurve = LIN;
+  env->dcurve = EXP;
+  env->rcurve = EXP;
 }
 
 uint16_t interp_adsr_seg(enum curves curve, float32_t phase) {
