@@ -126,7 +126,7 @@ uint16_t catch_param(uint16_t old, uint16_t cur, uint16_t thresh);
 
 uint16_t catch_param(uint16_t old, uint16_t cur, uint16_t thresh)
 {
-  return (abs(old - cur) < thresh) ? cur : old;
+  return (abs(old - cur) < thresh) ? 1 : 0;
 }
 
 /* USER CODE END 0 */
@@ -262,10 +262,11 @@ int main(void)
 	//update segment shapes choices based on these numbers
 	//Basically hold the button and move the pot of the parameter that you want to change shape
       } else {
-	envelopes[i].adsr[ATTACK]   = catch_param(envelopes[i].adsr[ATTACK],  aADCxConvertedData[ATTACK],  CATCH_THRESH);
-      	envelopes[i].adsr[DECAY]    = catch_param(envelopes[i].adsr[DECAY],   aADCxConvertedData[DECAY],   CATCH_THRESH);
-      	envelopes[i].adsr[SUSTAIN]  = catch_param(envelopes[i].adsr[SUSTAIN], aADCxConvertedData[SUSTAIN], CATCH_THRESH);
-      	envelopes[i].adsr[RELEASE]  = catch_param(envelopes[i].adsr[RELEASE], aADCxConvertedData[RELEASE], CATCH_THRESH);
+	for (j = 0; j < 4; j++) {
+	  if (seg_unlocked[j] || (seg_unlocked[j] = catch_param(envelopes[i].adsr[j], aADCxConvertedData[j], CATCH_THRESH))) {
+	    envelopes[i].adsr[j] = aADCxConvertedData[j];
+	  } 
+	}
       }
 
       // Process the envelopes
@@ -330,6 +331,9 @@ int main(void)
       	  case SINGLE:
 	    //cycle through the envelopes
       	    i = (i + 1) % NUM_ENVS;
+	    for (j = 0; j < 4; j++) {
+	      seg_unlocked[j] = 0;
+	    }
       	    break;
       	  case DOUBLE:
 	    //double click toggles invert of current envelope
